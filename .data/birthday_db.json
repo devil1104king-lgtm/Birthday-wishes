@@ -1,0 +1,337 @@
+{
+  "settings": {
+    "siteTitle": "Happy Birthday Meri Jaan ❤️",
+    "recipientName": "Aanchal",
+    "relationshipLabel": "Meri Jaan",
+    "birthdayDate": "2026-09-15",
+    "birthdayTime": "00:00",
+    "timezone": "Asia/Kolkata",
+    "heroHeading": "Happy Birthday",
+    "heroSubtitle": "To the person who makes life a little more beautiful...",
+    "openingTitle": "Someone made something special for you... ❤️",
+    "openingSubtitle": "Are you ready for your surprise?",
+    "openingButtonText": "✨ Open Your Surprise ✨",
+    "finalSurpriseTitle": "One last thing...",
+    "finalSurpriseMessage": "No matter where life takes you, always remember that you are deeply cherished, endlessly special, and worthy of all the stars in the universe. Happy Birthday, meri jaan. ❤️",
+    "replayButtonText": "✨ Replay Your Surprise ✨",
+    "faviconUrl": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=64&q=80",
+    "seoTitle": "A Special Birthday Surprise For You ❤️",
+    "seoDescription": "An interactive cinematic birthday celebration made with love.",
+    "ogImageUrl": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=1200&q=80"
+  },
+  "hero": {
+    "mainHeading": "Happy Birthday",
+    "recipientName": "Aanchal",
+    "subtitle": "To the person who turns ordinary moments into unforgettable memories...",
+    "showFloatingBalloons": true,
+    "showConfetti": true,
+    "showFloatingHearts": true,
+    "showGlowEffect": true
+  },
+  "music": [
+    {
+      "id": "music_1",
+      "title": "Romantic Piano Melody (Acoustic)",
+      "audioUrl": "https://actions.google.com/sounds/v1/ambiences/outdoor_evening_crickets.ogg",
+      "coverUrl": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&q=80",
+      "loop": true,
+      "volume": 0.7,
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "music_2",
+      "title": "Sweet Lullaby & Strings",
+      "audioUrl": "https://actions.google.com/sounds/v1/water/rain_heavy_loud.ogg",
+      "coverUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&q=80",
+      "loop": true,
+      "volume": 0.6,
+      "enabled": true,
+      "order": 2
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_1",
+      "title": "Happy Birthday, Meri Jaan ❤️",
+      "hindiText": "आज का दिन सिर्फ तुम्हारा है, इसलिए आज बस एक ही ख्वाहिश है — तुम्हारे चेहरे की यह खूबसूरत मुस्कान कभी कम न हो। तुम्हारी ज़िंदगी का हर नया पन्ना पिछले से कहीं ज्यादा हसीन हो। जो सपने तुम अपनी आँखों में संजो कर चलती हो, वो सब एक-एक करके हकीकत बनें। और चाहे ज़िंदगी कितनी भी व्यस्त क्यों न हो, तुम्हारे पास हमेशा खिलखिलाने की कोई वजह हो। Stay blessed, stay happy, and keep shining. 🌸❤️",
+      "englishText": "Today belongs entirely to you. My only wish today is that your radiant smile never fades. May every chapter of your life unfold even more wonderfully than the last. May each cherished dream you hold in your eyes turn into reality. Always remember how loved you are.",
+      "author": "With all my love",
+      "category": "Birthday Wish",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "msg_2",
+      "title": "The Warmth You Bring",
+      "hindiText": "कुछ लोग ज़िन्दगी में ऐसे आते हैं जैसे अंधेरी रात में चाँद की ठंडी रोशनी। तुम वही सुकून हो, जो बिना कुछ कहे भी दिल को हल्का कर देता है। थैंक यू मेरी ज़िंदगी को इतना खूबसूरत बनाने के लिए। ❤️",
+      "englishText": "Some people step into our lives like a gentle moonlight on a dark night. You are that serene peace that calms my heart without saying a word.",
+      "author": "Always Yours",
+      "category": "Heartfelt",
+      "enabled": true,
+      "order": 2
+    }
+  ],
+  "shayari": [
+    {
+      "id": "shayari_1",
+      "heading": "तुम्हारी हँसी का नूर 🌸",
+      "hindiText": "तुम्हारी हँसी यूँ ही खिलती रहे,\nहर सुबह नई खुशियाँ मिलती रहें,\nख़्वाब जो देखे हैं तुमने आँखों में,\nवो सारे एक दिन हक़ीक़त बनते रहें। ❤️",
+      "englishSubtitle": "May your laughter continue to bloom like spring flowers, and every dream in your eyes awaken into truth.",
+      "imageUrl": "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80",
+      "backgroundUrl": "",
+      "animationStyle": "fade-up",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "shayari_2",
+      "heading": "हर दुआ तुम्हारे नाम ✨",
+      "hindiText": "दुआ है मेरी हर खुशी तुम्हारे नाम हो,\nतुम्हारी ज़िन्दगी का हर पल गुलज़ार हो,\nचाहे कितने भी मौसम बदल जाएँ,\nतुम्हारे चेहरे पर हमेशा मुस्कान हो। 🌸",
+      "englishSubtitle": "My prayer is that all happiness finds your name, and no matter how seasons change, your smile remains untouched.",
+      "imageUrl": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80",
+      "backgroundUrl": "",
+      "animationStyle": "fade-up",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "shayari_3",
+      "heading": "चाँदनी सी मुस्कुराहट 🌙",
+      "hindiText": "सितारों से सजे ये रातें तुम्हारी,\nफूलों से महकें ये राहें तुम्हारी,\nजब भी तुम मुस्कुराओ दिल से,\nदुनिया भर की खुशियाँ हों तुम्हारी। ❤️",
+      "englishSubtitle": "May your nights be crowned with stars and your paths scented with blossoms whenever you smile.",
+      "imageUrl": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80",
+      "backgroundUrl": "",
+      "animationStyle": "fade-up",
+      "enabled": true,
+      "order": 3
+    }
+  ],
+  "memories": [
+    {
+      "id": "mem_1",
+      "imageUrl": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",
+      "title": "The First Coffee & Endless Laughter",
+      "caption": "When hours felt like minutes and every joke made us smile.",
+      "date": "Autumn Afternoon",
+      "description": "We sat by the window watching the rain, talking about everything and nothing. That day I realized how special your presence really is.",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "mem_2",
+      "imageUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "title": "That Unforgettable Smile",
+      "caption": "You didn't know I was looking, but you lit up the whole room.",
+      "date": "Sunset Stroll",
+      "description": "The golden hour light caught your eyes, and in that moment, the entire world stopped moving.",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "mem_3",
+      "imageUrl": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80",
+      "title": "Late Night Heart-to-Heart",
+      "caption": "Sharing secrets, dreams, and stargazing together.",
+      "date": "Winter Stars",
+      "description": "Under the quiet sky, listening to your dreams and knowing I want to cheer for you through all of them.",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "mem_4",
+      "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+      "title": "A Day by the Waves",
+      "caption": "Cold breeze, warm hands, and infinite waves.",
+      "date": "Summer Getaway",
+      "description": "The sand beneath our feet and the sound of waves washing away every worry.",
+      "enabled": true,
+      "order": 4
+    }
+  ],
+  "videos": [
+    {
+      "id": "vid_1",
+      "title": "Our Favorite Moments Compilation",
+      "description": "A montage of every time you made me laugh until my cheeks hurt.",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&q=80",
+      "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "platform": "mp4",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "vid_2",
+      "title": "Birthday Reel Special",
+      "description": "A sweet Instagram-style reel celebrating your journey and glow.",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80",
+      "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "platform": "mp4",
+      "enabled": true,
+      "order": 2
+    }
+  ],
+  "loveCards": [
+    {
+      "id": "card_1",
+      "title": "Your Smile 😊",
+      "text": "The way your entire face lights up whenever you laugh genuinely. It has the magic to turn the toughest day into pure warmth.",
+      "icon": "smile",
+      "imageUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80",
+      "animation": "scale",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "card_2",
+      "title": "The Way You Care ❤️",
+      "text": "How you notice little things nobody else catches. You make everyone around you feel valued, heard, and deeply protected.",
+      "icon": "heart",
+      "imageUrl": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80",
+      "animation": "scale",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "card_3",
+      "title": "Your Little Habits 🌸",
+      "text": "The cute way you get excited about food, the way you scrunch your nose, and the funny faces you make when thinking.",
+      "icon": "sparkles",
+      "imageUrl": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80",
+      "animation": "scale",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "card_4",
+      "title": "Your Pure Heart ✨",
+      "text": "In a world that can often be cynical, your kindness is effortless, sincere, and rare. Never let the world change that.",
+      "icon": "star",
+      "imageUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80",
+      "animation": "scale",
+      "enabled": true,
+      "order": 4
+    }
+  ],
+  "timeline": [
+    {
+      "id": "time_1",
+      "title": "When Our Worlds Collided",
+      "text": "The day we first met. Who knew that a simple 'hello' would become my favorite chapter in life?",
+      "image": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80",
+      "date": "Chapter 1",
+      "animation": "slide-right",
+      "order": 1,
+      "enabled": true
+    },
+    {
+      "id": "time_2",
+      "title": "The First Real Conversation",
+      "text": "When we talked late into the night and realized our weird sense of humor matched perfectly.",
+      "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80",
+      "date": "Chapter 2",
+      "animation": "slide-left",
+      "order": 2,
+      "enabled": true
+    },
+    {
+      "id": "time_3",
+      "title": "Becoming Inseparable",
+      "text": "Every day became brighter because we shared it together. Every memory became precious.",
+      "image": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80",
+      "date": "Chapter 3",
+      "animation": "slide-right",
+      "order": 3,
+      "enabled": true
+    },
+    {
+      "id": "time_4",
+      "title": "Celebrating You Today",
+      "text": "Today we celebrate you, your journey, your growth, and the beautiful soul you are.",
+      "image": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80",
+      "date": "Today & Forever",
+      "animation": "slide-left",
+      "order": 4,
+      "enabled": true
+    }
+  ],
+  "reasons": [
+    {
+      "id": "reason_1",
+      "title": "Your Unmatched Kindness",
+      "description": "You treat people with genuine grace and respect.",
+      "icon": "heart",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "reason_2",
+      "title": "How You Light Up Any Room",
+      "description": "Your positive energy is magnetic and contagious.",
+      "icon": "sun",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "reason_3",
+      "title": "Your Unwavering Support",
+      "description": "Knowing you believe in me gives me courage every single day.",
+      "icon": "shield",
+      "enabled": true,
+      "order": 3
+    }
+  ],
+  "surprises": {
+    "showTreeAnimation": true,
+    "treeMessage": "Growing a little more love for you every single day. ❤️",
+    "showCake": true,
+    "cakeHeading": "Make a Wish... 🎂",
+    "cakeSubtext": "Click or tap each candle to blow it out!",
+    "cakeWishGrantedText": "Wish Granted! May the universe conspire to give you all you desire. ❤️",
+    "showCountdown": true,
+    "countdownHeading": "The Countdown To Your Birthday",
+    "countdownCelebrationMessage": "✨ The Moment Is Here! Happy Birthday, Meri Jaan! 🎂🎉✨",
+    "showMusicVisualizer": true,
+    "showLoveLetter": true,
+    "loveLetterTitle": "Things I Want To Tell You",
+    "loveLetterText": "Thank you for being you. Thank you for all the little moments, the quiet smiles, and the warm hugs. You deserve every ounce of joy in this world. Never forget how loved and cherished you are."
+  },
+  "appearance": {
+    "themePreset": "romantic",
+    "primaryColor": "#f43f5e",
+    "secondaryColor": "#fb7185",
+    "accentColor": "#f472b6",
+    "backgroundStyle": "cinematic-dark",
+    "headingFont": "Playfair Display",
+    "bodyFont": "Outfit",
+    "cardStyle": "glass-dark",
+    "borderRadius": "16px",
+    "glowIntensity": "medium",
+    "buttonStyle": "pill-glow",
+    "particlesEnabled": true,
+    "heartsEnabled": true,
+    "confettiEnabled": true,
+    "petalsEnabled": true,
+    "backgroundMotionEnabled": true,
+    "reducedMotion": false,
+    "particleDensity": 35,
+    "heartDensity": 20
+  },
+  "countdown": {
+    "targetDate": "2026-09-15",
+    "targetTime": "00:00",
+    "timezone": "Asia/Kolkata",
+    "preBirthdayHeading": "Counting Down The Seconds...",
+    "atBirthdayMessage": "🎉 HAPPY BIRTHDAY MERI JAAN! Today is all yours! ❤️",
+    "postBirthdayMessage": "The celebration never ends for someone as special as you. 🌸",
+    "autoConfettiOnZero": true,
+    "enabled": true
+  },
+  "admins": [
+    {
+      "username": "admin",
+      "passwordHash": "$2b$10$bkkVwJHrrYJ17BDFKOA.G.egy4AqSBYlkhZbl42cAc3AmuvGC46XO",
+      "createdAt": "2026-09-04T15:20:52.021Z"
+    }
+  ]
+}

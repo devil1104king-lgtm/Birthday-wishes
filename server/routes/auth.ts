@@ -15,12 +15,12 @@ router.post('/login', async (req, res: Response) => {
 
     const admin = await dbService.getAdminByUsername(username.trim());
     if (!admin) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid username or password.' });
     }
 
     const isMatch = await bcrypt.compare(password, admin.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid username or password.' });
     }
 
     const token = generateToken(admin.username);

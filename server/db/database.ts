@@ -474,6 +474,10 @@ class DatabaseService {
             passwordHash: hash,
           } as any);
           console.log(`Initialized admin user: ${defaultUser}`);
+        } else if (process.env.ADMIN_PASSWORD) {
+          // If ADMIN_PASSWORD is provided in environment variables, keep password in sync
+          existing.passwordHash = hash;
+          await existing.save();
         }
       } catch (err) {
         console.error('Error ensuring admin in Mongo:', err);
@@ -491,16 +495,28 @@ class DatabaseService {
         });
         this.saveLocalData();
         console.log(`Initialized local admin user: ${defaultUser}`);
+      } else if (process.env.ADMIN_PASSWORD) {
+        existing.passwordHash = hash;
+        this.saveLocalData();
       }
     }
   }
 
   // --- Admin Auth ---
   public async getAdminByUsername(username: string) {
+    const cleanUser = (username || '').trim();
+    if (!cleanUser) return null;
+
     if (this.isMongoConnected) {
-      return await AdminModel.findOne({ username } as any).lean();
+      return await AdminModel.findOne({
+        username: { $regex: new RegExp(`^${cleanUser.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      } as any).lean();
     }
-    return (this.memoryData.admins || []).find((a: any) => a.username === username) || null;
+    return (
+      (this.memoryData.admins || []).find(
+        (a: any) => a.username.toLowerCase() === cleanUser.toLowerCase()
+      ) || null
+    );
   }
 
   public async updateAdminPassword(username: string, newPasswordHash: string) {

@@ -32,7 +32,7 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }: AdminLoginP
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || 'Invalid credentials. Please verify and try again.');
+        setError(data.error || 'Invalid username or password.');
         setLoading(false);
         return;
       }
@@ -69,11 +69,11 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }: AdminLoginP
           <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mx-auto mb-4 text-rose-400">
             <Lock className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-serif font-bold text-white tracking-wide">
-            Admin Authentication
+          <h1 className="text-2xl font-serif font-bold text-white tracking-wider uppercase">
+            Birthday Admin
           </h1>
-          <p className="text-xs text-neutral-400 mt-1">
-            Manage all surprise messages, photos, shayari & settings
+          <p className="text-xs text-rose-400/90 font-medium tracking-wide mt-1 uppercase">
+            Secure Dashboard
           </p>
         </div>
 

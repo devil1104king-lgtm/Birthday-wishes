@@ -21,6 +21,8 @@ import {
   Palette,
   Eye,
   X,
+  Menu,
+  ChevronDown,
 } from 'lucide-react';
 import {
   AdminDataBundle,
@@ -61,6 +63,7 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
   const [data, setData] = useState<AdminDataBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('settings');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -223,84 +226,129 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
   }
 
   const navTabs: { id: TabType; label: string; icon: any }[] = [
-    { id: 'settings', label: 'General & Names', icon: Settings },
-    { id: 'hero', label: 'Hero Banner', icon: Sparkles },
-    { id: 'music', label: 'Music Playlist', icon: Music },
-    { id: 'messages', label: 'Heartfelt Letter', icon: Heart },
-    { id: 'shayari', label: 'Poetry & Shayari', icon: Layers },
-    { id: 'cards', label: 'Special Reasons', icon: Sparkles },
-    { id: 'memories', label: 'Photo Gallery', icon: Image },
-    { id: 'videos', label: 'Reels & Videos', icon: Film },
+    { id: 'settings', label: 'General Settings', icon: Settings },
+    { id: 'messages', label: 'Birthday Message', icon: Heart },
+    { id: 'shayari', label: 'Shayari & Poetry', icon: Layers },
+    { id: 'memories', label: 'Images & Memories', icon: Image },
+    { id: 'videos', label: 'Videos & Reels', icon: Film },
     { id: 'timeline', label: 'Our Story Timeline', icon: Calendar },
-    { id: 'surprises', label: 'Interactive Surprises', icon: Clock },
-    { id: 'appearance', label: 'Theme & FX', icon: Palette },
+    { id: 'music', label: 'Music Playlist', icon: Music },
+    { id: 'surprises', label: 'Interactive Surprises & Cake', icon: Sparkles },
+    { id: 'appearance', label: 'Theme & Background FX', icon: Palette },
+    { id: 'hero', label: 'Hero Celebration Banner', icon: Clock },
+    { id: 'cards', label: 'Love Cards & Reasons', icon: Heart },
   ];
+
+  const currentTabObj = navTabs.find((t) => t.id === activeTab) || navTabs[0];
 
   return (
     <div id="admin-dashboard" className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
       {/* Top Bar */}
-      <header className="sticky top-0 z-40 bg-neutral-900/90 backdrop-blur-md border-b border-neutral-800 px-6 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center text-white shadow-md">
+      <header className="sticky top-0 z-40 bg-neutral-900/95 backdrop-blur-md border-b border-neutral-800 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center text-white shadow-md shrink-0">
             <Heart className="w-5 h-5 fill-white" />
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-white tracking-wide">
-              Surprise Control Center
+            <h1 className="text-xs sm:text-sm font-semibold text-white tracking-wide">
+              Birthday Admin Dashboard
             </h1>
-            <p className="text-[11px] text-neutral-400">
+            <p className="text-[10px] sm:text-[11px] text-neutral-400 truncate max-w-[140px] sm:max-w-none">
               For <span className="text-rose-400 font-medium">{data.settings.recipientName}</span> • Real-time DB Sync
             </p>
           </div>
         </div>
 
         {/* Global Action Buttons */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           <button
             id="admin-view-site-button"
             onClick={onViewSite}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-medium text-neutral-200 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-medium text-neutral-200 transition-colors cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5 text-rose-400" />
-            <span className="hidden sm:inline">Preview Surprise</span>
+            <span className="hidden sm:inline">Preview Site</span>
           </button>
 
           <button
             id="admin-reset-defaults-button"
             onClick={handleResetDefaults}
             disabled={saving}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-rose-950/60 hover:text-rose-300 text-xs font-medium text-neutral-400 border border-neutral-700 transition-colors"
+            className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-neutral-800 hover:bg-rose-950/60 hover:text-rose-300 text-xs font-medium text-neutral-400 border border-neutral-700 transition-colors cursor-pointer"
             title="Restore romantic defaults"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Reset Defaults</span>
+            <span>Reset Defaults</span>
           </button>
 
           <button
             id="admin-logout-button"
             onClick={onLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-xs font-medium text-rose-300 border border-rose-800/40 hover:text-white transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Logout</span>
+            <span>Logout</span>
           </button>
         </div>
       </header>
+
+      {/* Mobile Collapsible Navigation Selector (Phones & Tablets) */}
+      <div className="md:hidden border-b border-neutral-800 bg-neutral-900/90 px-4 py-2.5 flex items-center justify-between">
+        <button
+          id="admin-mobile-menu-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="flex items-center gap-2 text-xs font-medium text-white px-3 py-2 rounded-xl bg-neutral-800 border border-neutral-700 active:bg-neutral-700 transition-colors cursor-pointer min-h-[44px]"
+        >
+          <Menu className="w-4 h-4 text-rose-400" />
+          <span className="text-rose-300">{currentTabObj.label}</span>
+          <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+        </button>
+        <span className="text-[11px] text-neutral-400 font-mono">
+          Tab {navTabs.findIndex(t => t.id === activeTab) + 1}/{navTabs.length}
+        </span>
+      </div>
+
+      {/* Mobile Menu Dropdown Panel */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-neutral-900/95 border-b border-neutral-800 p-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 animate-fade-in z-30">
+          {navTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setMobileMenuOpen(false);
+                }}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium transition-all text-left cursor-pointer min-h-[44px] ${
+                  isActive
+                    ? 'bg-rose-600/20 text-rose-300 border border-rose-500/40 font-semibold'
+                    : 'text-neutral-300 hover:text-white hover:bg-neutral-800/80 bg-neutral-950/40'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? 'text-rose-400' : 'text-neutral-400'}`} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Status Toast Notification */}
       {saveStatus && (
         <div
           id="admin-toast-message"
-          className={`fixed top-16 right-6 z-50 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2 shadow-2xl transition-all ${
+          className={`fixed top-16 right-4 sm:right-6 z-50 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2 shadow-2xl transition-all ${
             saveStatus.type === 'success'
               ? 'bg-emerald-950/90 text-emerald-200 border border-emerald-500/40'
               : 'bg-rose-950/90 text-rose-200 border border-rose-500/40'
           }`}
         >
           {saveStatus.type === 'success' ? (
-            <Check className="w-4 h-4 text-emerald-400" />
+            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-rose-400" />
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
           )}
           <span>{saveStatus.message}</span>
         </div>
@@ -308,8 +356,11 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
 
       {/* Main Workspace Layout */}
       <div className="flex-1 flex flex-col md:flex-row">
-        {/* Sidebar Tabs */}
-        <aside className="w-full md:w-64 bg-neutral-900/60 border-r border-neutral-800/80 p-3 sm:p-4 flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible shrink-0">
+        {/* Desktop Fixed Sidebar */}
+        <aside className="hidden md:flex w-64 bg-neutral-900/60 border-r border-neutral-800/80 p-4 flex-col gap-1 shrink-0">
+          <div className="text-[10px] uppercase font-mono tracking-wider text-neutral-400 px-3 py-1 mb-1">
+            Navigation Sections
+          </div>
           {navTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -320,7 +371,7 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'bg-rose-600/20 text-rose-300 border border-rose-500/40 shadow-sm'
+                    ? 'bg-rose-600/20 text-rose-300 border border-rose-500/40 shadow-sm font-semibold'
                     : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/60'
                 }`}
               >
@@ -332,7 +383,7 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
         </aside>
 
         {/* Tab Content Panel */}
-        <main className="flex-1 p-6 md:p-10 max-w-5xl overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 md:p-10 max-w-5xl overflow-y-auto">
           {/* TAB 1: GENERAL SETTINGS */}
           {activeTab === 'settings' && (
             <div className="space-y-6">

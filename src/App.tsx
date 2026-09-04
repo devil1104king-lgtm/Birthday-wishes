@@ -19,6 +19,18 @@ import FinalSurpriseSection from './components/sections/FinalSurpriseSection';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 
+// Helper to get normalized current path
+function getPath(): string {
+  if (typeof window === 'undefined') return '/';
+  const pathname = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  return pathname;
+}
+
+// Helper to check if current path is an admin route (/admin, /admin/login, /admin/dashboard, etc.)
+function isAdminPath(path: string): boolean {
+  return path === '/admin' || path.startsWith('/admin/');
+}
+
 export default function App() {
   const [data, setData] = useState<PublicDataBundle | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,11 +40,69 @@ export default function App() {
   const [showIntro, setShowIntro] = useState(false);
   const [autoPlayMusic, setAutoPlayMusic] = useState(false);
 
-  // Admin routing
-  const [viewMode, setViewMode] = useState<'site' | 'admin_login' | 'admin_dashboard'>('site');
+  // Real URL-based routing state
+  const [currentPath, setCurrentPath] = useState<string>(() => getPath());
   const [adminToken, setAdminToken] = useState<string | null>(() => {
     return sessionStorage.getItem('admin_token');
   });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [checkingAuth, setCheckingAuth] = useState<boolean>(() => isAdminPath(getPath()));
+
+  // Navigation function that updates browser history and component state
+  const navigate = (path: string) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+    setCurrentPath(path);
+  };
+
+  // Sync with browser Back and Forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(getPath());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Verify authentication when on any /admin route
+  useEffect(() => {
+    if (isAdminPath(currentPath)) {
+      let isMounted = true;
+      const verifySession = async () => {
+        setCheckingAuth(true);
+        try {
+          const token = sessionStorage.getItem('admin_token');
+          const headers: Record<string, string> = {};
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          const res = await fetch('/api/auth/me', { headers });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.authenticated && isMounted) {
+              setIsAuthenticated(true);
+              if (token) setAdminToken(token);
+              setCheckingAuth(false);
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn('Session verification failed:', err);
+        }
+        if (isMounted) {
+          setIsAuthenticated(false);
+          setAdminToken(null);
+          sessionStorage.removeItem('admin_token');
+          setCheckingAuth(false);
+        }
+      };
+      verifySession();
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [currentPath]);
 
   // Fetch public surprise data
   const loadData = async () => {
@@ -56,6 +126,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Only load public data if not solely on admin or when public site is accessed
     loadData();
   }, []);
 
@@ -89,45 +160,61 @@ export default function App() {
   const handleLoginSuccess = (token: string) => {
     sessionStorage.setItem('admin_token', token);
     setAdminToken(token);
-    setViewMode('admin_dashboard');
+    setIsAuthenticated(true);
+    navigate('/admin');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     sessionStorage.removeItem('admin_token');
     setAdminToken(null);
-    setViewMode('site');
-    loadData();
+    setIsAuthenticated(false);
+    navigate('/admin');
   };
 
+  // RENDER ADMIN ROUTE (/admin, /admin/login, /admin/dashboard, etc.)
+  if (isAdminPath(currentPath)) {
+    if (checkingAuth) {
+      return (
+        <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white p-6">
+          <div className="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-sm font-serif text-neutral-400">Verifying admin credentials...</p>
+        </div>
+      );
+    }
+
+    if (isAuthenticated) {
+      return (
+        <AdminDashboard
+          token={adminToken || ''}
+          onLogout={handleLogout}
+          onViewSite={() => {
+            navigate('/');
+            loadData();
+          }}
+        />
+      );
+    }
+
+    return (
+      <AdminLogin
+        onLoginSuccess={handleLoginSuccess}
+        onBackToSite={() => navigate('/')}
+      />
+    );
+  }
+
+  // RENDER PUBLIC SITE ROUTE (/)
   if (loading || !data) {
     return (
       <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white">
         <div className="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-sm font-serif text-neutral-400">Preparing something beautiful...</p>
       </div>
-    );
-  }
-
-  // Render Admin Flow
-  if (viewMode === 'admin_login') {
-    return (
-      <AdminLogin
-        onLoginSuccess={handleLoginSuccess}
-        onBackToSite={() => setViewMode('site')}
-      />
-    );
-  }
-
-  if (viewMode === 'admin_dashboard' && adminToken) {
-    return (
-      <AdminDashboard
-        token={adminToken}
-        onLogout={handleLogout}
-        onViewSite={() => {
-          setViewMode('site');
-          loadData();
-        }}
-      />
     );
   }
 
@@ -228,13 +315,7 @@ export default function App() {
           {/* 12. Footer with Discreet Admin Portal Access */}
           <Footer
             settings={data.settings}
-            onOpenAdmin={() => {
-              if (adminToken) {
-                setViewMode('admin_dashboard');
-              } else {
-                setViewMode('admin_login');
-              }
-            }}
+            onOpenAdmin={() => navigate('/admin')}
           />
         </div>
       )}
