@@ -43,7 +43,7 @@ export const SiteSettingsSchema = new Schema<ISiteSettings>(
     siteTitle: { type: String, default: 'Happy Birthday My Love' },
     recipientName: { type: String, default: 'Meri Jaan' },
     relationshipLabel: { type: String, default: 'Meri Jaan' },
-    birthdayDate: { type: String, default: '2026-09-15' },
+    birthdayDate: { type: String, default: '2026-09-05' },
     birthdayTime: { type: String, default: '00:00' },
     timezone: { type: String, default: 'Asia/Kolkata' },
     heroHeading: { type: String, default: 'Happy Birthday' },
@@ -377,7 +377,7 @@ export interface ICountdownSettings {
 
 export const CountdownSettingsSchema = new Schema<ICountdownSettings>(
   {
-    targetDate: { type: String, default: '2026-09-15' },
+    targetDate: { type: String, default: '2026-09-05' },
     targetTime: { type: String, default: '00:00' },
     timezone: { type: String, default: 'Asia/Kolkata' },
     preBirthdayHeading: { type: String, default: 'The Countdown to Your Day' },

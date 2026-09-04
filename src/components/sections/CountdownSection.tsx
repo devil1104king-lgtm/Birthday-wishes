@@ -8,6 +8,54 @@ interface CountdownSectionProps {
   settings: SiteSettings;
 }
 
+function parseTargetTimestamp(dateInput: string, timeInput: string, timeZone: string = 'Asia/Kolkata'): number {
+  if (!dateInput) return 0;
+  let normalizedDate = dateInput.trim();
+
+  // Normalize DD/MM/YYYY or DD-MM-YYYY to YYYY-MM-DD
+  const dmy = normalizedDate.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (dmy) {
+    normalizedDate = `${dmy[3]}-${dmy[2].padStart(2, '0')}-${dmy[1].padStart(2, '0')}`;
+  } else {
+    // Check YYYY/MM/DD
+    const ymd = normalizedDate.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+    if (ymd) {
+      normalizedDate = `${ymd[1]}-${ymd[2].padStart(2, '0')}-${ymd[3].padStart(2, '0')}`;
+    }
+  }
+
+  const [y, m, d] = normalizedDate.split('-').map(Number);
+  if (!y || !m || !d) return 0;
+
+  const [hh, mm] = (timeInput || '00:00').split(':').map(Number);
+  const hour = isNaN(hh) ? 0 : hh;
+  const minute = isNaN(mm) ? 0 : mm;
+
+  let offsetStr = '+05:30';
+  if (timeZone === 'Asia/Kolkata' || timeZone === 'IST') {
+    offsetStr = '+05:30';
+  } else {
+    try {
+      const testDate = new Date(Date.UTC(y, m - 1, d, hour, minute));
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        timeZoneName: 'longOffset',
+      }).formatToParts(testDate);
+      const tzPart = parts.find((item) => item.type === 'timeZoneName');
+      if (tzPart && tzPart.value.startsWith('GMT')) {
+        offsetStr = tzPart.value.replace('GMT', '');
+      }
+    } catch {
+      offsetStr = '+05:30';
+    }
+  }
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const isoString = `${String(y).padStart(4, '0')}-${pad(m)}-${pad(d)}T${pad(hour)}:${pad(minute)}:00${offsetStr}`;
+  const parsed = new Date(isoString).getTime();
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 export default function CountdownSection({ countdown, settings }: CountdownSectionProps) {
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
@@ -29,16 +77,21 @@ export default function CountdownSection({ countdown, settings }: CountdownSecti
 
   useEffect(() => {
     const calculateTime = () => {
-      const dateStr = countdown.targetDate || settings.birthdayDate || '2026-09-15';
-      const timeStr = countdown.targetTime || settings.birthdayTime || '00:00';
+      // settings.birthdayDate is the canonical single source of truth from General Surprise Settings
+      const dateStr = settings.birthdayDate || countdown.targetDate;
+      const timeStr = settings.birthdayTime || countdown.targetTime || '00:00';
+      const timeZone = settings.timezone || countdown.timezone || 'Asia/Kolkata';
 
-      const target = new Date(`${dateStr}T${timeStr}:00`);
-      const now = new Date();
+      if (!dateStr) return;
 
-      const diff = target.getTime() - now.getTime();
+      const targetMs = parseTargetTimestamp(dateStr, timeStr, timeZone);
+      if (!targetMs) return;
+
+      const now = Date.now();
+      const diff = targetMs - now;
 
       if (diff <= 0) {
-        // Today or past
+        // Birthday moment has arrived or is today
         const isWithin24Hours = Math.abs(diff) < 24 * 60 * 60 * 1000;
         setTimeLeft({
           days: 0,
@@ -51,10 +104,10 @@ export default function CountdownSection({ countdown, settings }: CountdownSecti
 
         if (countdown.autoConfettiOnZero && !hasCelebrated) {
           confetti({
-            particleCount: 70,
-            spread: 90,
-            origin: { y: 0.7 },
-            colors: ['#f43f5e', '#ec4899', '#fbbf24', '#ffffff'],
+            particleCount: 80,
+            spread: 100,
+            origin: { y: 0.65 },
+            colors: ['#f43f5e', '#ec4899', '#fbbf24', '#ffffff', '#e11d48'],
           });
           setHasCelebrated(true);
         }
@@ -67,10 +120,10 @@ export default function CountdownSection({ countdown, settings }: CountdownSecti
       const seconds = Math.floor((diff / 1000) % 60);
 
       setTimeLeft({
-        days,
-        hours,
-        minutes,
-        seconds,
+        days: Math.max(0, days),
+        hours: Math.max(0, hours),
+        minutes: Math.max(0, minutes),
+        seconds: Math.max(0, seconds),
         isPast: false,
         isToday: false,
       });

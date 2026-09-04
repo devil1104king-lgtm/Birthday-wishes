@@ -168,7 +168,16 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
             endpoint === 'settings' && data.hero
               ? { ...data.hero, recipientName: json.data?.recipientName || '' }
               : data.hero;
-          setData({ ...data, [endpoint]: json.data, hero: updatedHero });
+          const updatedCountdown =
+            endpoint === 'settings' && data.countdown
+              ? {
+                  ...data.countdown,
+                  targetDate: json.data?.birthdayDate,
+                  targetTime: json.data?.birthdayTime || '00:00',
+                  timezone: json.data?.timezone || 'Asia/Kolkata',
+                }
+              : data.countdown;
+          setData({ ...data, [endpoint]: json.data, hero: updatedHero, countdown: updatedCountdown });
         }
       } else {
         showToast('error', json.error || 'Failed to update section');
@@ -514,6 +523,24 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
                           settings: { ...data.settings, birthdayTime: e.target.value },
                         })
                       }
+                      className="w-full px-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-white focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase font-medium text-neutral-400 mb-2">
+                      Timezone (Default: Asia/Kolkata)
+                    </label>
+                    <input
+                      type="text"
+                      value={data.settings.timezone || 'Asia/Kolkata'}
+                      onChange={(e) =>
+                        setData({
+                          ...data,
+                          settings: { ...data.settings, timezone: e.target.value },
+                        })
+                      }
+                      placeholder="Asia/Kolkata"
                       className="w-full px-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-white focus:border-rose-500 focus:outline-none"
                     />
                   </div>

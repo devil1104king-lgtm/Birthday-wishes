@@ -41,7 +41,7 @@ export const DEFAULT_SEED_DATA = {
     siteTitle: "Happy Birthday Meri Jaan ❤️",
     recipientName: "Meri Jaan",
     relationshipLabel: "Meri Jaan",
-    birthdayDate: "2026-09-15",
+    birthdayDate: "2026-09-05",
     birthdayTime: "00:00",
     timezone: "Asia/Kolkata",
     heroHeading: "Happy Birthday",
@@ -356,7 +356,7 @@ export const DEFAULT_SEED_DATA = {
     heartDensity: 20
   },
   countdown: {
-    targetDate: "2026-09-15",
+    targetDate: "2026-09-05",
     targetTime: "00:00",
     timezone: "Asia/Kolkata",
     preBirthdayHeading: "Counting Down The Seconds...",
@@ -366,6 +366,26 @@ export const DEFAULT_SEED_DATA = {
     enabled: true
   }
 };
+
+function normalizeDateToYYYYMMDD(dateStr: string): string {
+  if (!dateStr) return '';
+  const trimmed = dateStr.trim();
+  const dmyMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (dmyMatch) {
+    const day = dmyMatch[1].padStart(2, '0');
+    const month = dmyMatch[2].padStart(2, '0');
+    const year = dmyMatch[3];
+    return `${year}-${month}-${day}`;
+  }
+  const ymdMatch = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if (ymdMatch) {
+    const year = ymdMatch[1];
+    const month = ymdMatch[2].padStart(2, '0');
+    const day = ymdMatch[3].padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  return trimmed;
+}
 
 // Robust Storage Class that bridges MongoDB Mongoose and local disk persistence
 class DatabaseService {
@@ -579,8 +599,17 @@ class DatabaseService {
 
       const resolvedSettings = (settings || DEFAULT_SEED_DATA.settings) as any;
       const resolvedHero = (hero || DEFAULT_SEED_DATA.hero) as any;
-      if (resolvedHero && resolvedSettings) {
-        resolvedHero.recipientName = resolvedSettings.recipientName || '';
+      const resolvedCountdown = (countdown || DEFAULT_SEED_DATA.countdown) as any;
+
+      if (resolvedSettings) {
+        if (resolvedHero) {
+          resolvedHero.recipientName = resolvedSettings.recipientName || '';
+        }
+        if (resolvedCountdown) {
+          resolvedCountdown.targetDate = resolvedSettings.birthdayDate || '2026-09-05';
+          resolvedCountdown.targetTime = resolvedSettings.birthdayTime || '00:00';
+          resolvedCountdown.timezone = resolvedSettings.timezone || 'Asia/Kolkata';
+        }
       }
 
       return {
@@ -596,15 +625,23 @@ class DatabaseService {
         reasons: reasons || DEFAULT_SEED_DATA.reasons,
         surprises: surprises || DEFAULT_SEED_DATA.surprises,
         appearance: appearance || DEFAULT_SEED_DATA.appearance,
-        countdown: countdown || DEFAULT_SEED_DATA.countdown,
+        countdown: resolvedCountdown,
       };
     }
 
     // Fallback: Local persistent data filtered for enabled
     const fallbackSettings = (this.memoryData.settings || DEFAULT_SEED_DATA.settings) as any;
     const fallbackHero = (this.memoryData.hero || DEFAULT_SEED_DATA.hero) as any;
-    if (fallbackHero && fallbackSettings) {
-      fallbackHero.recipientName = fallbackSettings.recipientName || '';
+    const fallbackCountdown = (this.memoryData.countdown || DEFAULT_SEED_DATA.countdown) as any;
+    if (fallbackSettings) {
+      if (fallbackHero) {
+        fallbackHero.recipientName = fallbackSettings.recipientName || '';
+      }
+      if (fallbackCountdown) {
+        fallbackCountdown.targetDate = fallbackSettings.birthdayDate || '2026-09-05';
+        fallbackCountdown.targetTime = fallbackSettings.birthdayTime || '00:00';
+        fallbackCountdown.timezone = fallbackSettings.timezone || 'Asia/Kolkata';
+      }
     }
 
     return {
@@ -620,7 +657,7 @@ class DatabaseService {
       reasons: (this.memoryData.reasons || []).filter((r: any) => r.enabled !== false),
       surprises: this.memoryData.surprises || DEFAULT_SEED_DATA.surprises,
       appearance: this.memoryData.appearance || DEFAULT_SEED_DATA.appearance,
-      countdown: this.memoryData.countdown || DEFAULT_SEED_DATA.countdown,
+      countdown: fallbackCountdown,
     };
   }
 
@@ -659,8 +696,16 @@ class DatabaseService {
 
       const adminSettings = (settings || DEFAULT_SEED_DATA.settings) as any;
       const adminHero = (hero || DEFAULT_SEED_DATA.hero) as any;
-      if (adminHero && adminSettings) {
-        adminHero.recipientName = adminSettings.recipientName || '';
+      const adminCountdown = (countdown || DEFAULT_SEED_DATA.countdown) as any;
+      if (adminSettings) {
+        if (adminHero) {
+          adminHero.recipientName = adminSettings.recipientName || '';
+        }
+        if (adminCountdown) {
+          adminCountdown.targetDate = adminSettings.birthdayDate || '2026-09-05';
+          adminCountdown.targetTime = adminSettings.birthdayTime || '00:00';
+          adminCountdown.timezone = adminSettings.timezone || 'Asia/Kolkata';
+        }
       }
 
       return {
@@ -676,7 +721,7 @@ class DatabaseService {
         reasons: reasons || [],
         surprises: surprises || DEFAULT_SEED_DATA.surprises,
         appearance: appearance || DEFAULT_SEED_DATA.appearance,
-        countdown: countdown || DEFAULT_SEED_DATA.countdown,
+        countdown: adminCountdown,
         isMongoConnected: this.isMongoConnected,
       };
     }
@@ -689,10 +734,49 @@ class DatabaseService {
 
   // --- Settings CRUD ---
   public async updateSettings(data: any) {
-    if (this.isMongoConnected) {
-      return await (SiteSettingsModel as any).findOneAndUpdate({}, data, { upsert: true, new: true });
+    if (data.birthdayDate) {
+      data.birthdayDate = normalizeDateToYYYYMMDD(data.birthdayDate);
     }
+    if (!data.timezone) {
+      data.timezone = 'Asia/Kolkata';
+    }
+
+    if (this.isMongoConnected) {
+      const updated = await (SiteSettingsModel as any).findOneAndUpdate({}, data, { upsert: true, new: true });
+      if (data.birthdayDate || data.birthdayTime) {
+        await (CountdownSettingsModel as any).findOneAndUpdate(
+          {},
+          {
+            targetDate: data.birthdayDate || updated.birthdayDate,
+            targetTime: data.birthdayTime || updated.birthdayTime || '00:00',
+            timezone: data.timezone || updated.timezone || 'Asia/Kolkata',
+          },
+          { upsert: true, new: true }
+        );
+      }
+      if (data.recipientName) {
+        await (HeroSectionModel as any).findOneAndUpdate(
+          {},
+          { recipientName: data.recipientName },
+          { upsert: true, new: true }
+        );
+      }
+      return updated;
+    }
+
     this.memoryData.settings = { ...this.memoryData.settings, ...data };
+    if (!this.memoryData.countdown) {
+      this.memoryData.countdown = { ...DEFAULT_SEED_DATA.countdown };
+    }
+    this.memoryData.countdown.targetDate = this.memoryData.settings.birthdayDate;
+    this.memoryData.countdown.targetTime = this.memoryData.settings.birthdayTime || '00:00';
+    this.memoryData.countdown.timezone = this.memoryData.settings.timezone || 'Asia/Kolkata';
+
+    if (!this.memoryData.hero) {
+      this.memoryData.hero = { ...DEFAULT_SEED_DATA.hero };
+    }
+    this.memoryData.hero.recipientName = this.memoryData.settings.recipientName;
+
     this.saveLocalData();
     return this.memoryData.settings;
   }

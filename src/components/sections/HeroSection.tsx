@@ -8,14 +8,13 @@ interface HeroProps {
 }
 
 export default function HeroSection({ hero, settings, onScrollToExplore }: HeroProps) {
-  const recipientName = (settings.recipientName || '').trim() || 'Meri Jaan';
+  const recipientName = (settings.recipientName || hero.recipientName || '').trim() || 'Meri Jaan';
   const relationship = (settings.relationshipLabel || '').trim() || 'Meri Jaan';
 
-  // Construct heading: if custom mainHeading already has recipientName, use it; otherwise combine mainHeading + recipientName
-  let displayHeading = (hero.mainHeading || settings.heroHeading || 'Happy Birthday').trim();
-  if (recipientName && !displayHeading.toLowerCase().includes(recipientName.toLowerCase())) {
-    displayHeading = `${displayHeading} ${recipientName}`;
-  }
+  // Construct heading cleanly:
+  // Base heading (default "Happy Birthday") + Recipient Name from Admin Settings
+  const baseHeading = (settings.heroHeading || 'Happy Birthday').trim();
+  const displayHeading = `${baseHeading} ${recipientName}`.trim();
 
   const subtitle = hero.subtitle || settings.heroSubtitle || 'To the person who makes life a little more beautiful...';
 

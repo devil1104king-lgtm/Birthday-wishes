@@ -43,7 +43,7 @@ export default function App() {
   // Real URL-based routing state
   const [currentPath, setCurrentPath] = useState<string>(() => getPath());
   const [adminToken, setAdminToken] = useState<string | null>(() => {
-    return sessionStorage.getItem('admin_token');
+    return sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
   });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(() => isAdminPath(getPath()));
@@ -159,6 +159,7 @@ export default function App() {
   // Admin Auth Handlers
   const handleLoginSuccess = (token: string) => {
     sessionStorage.setItem('admin_token', token);
+    localStorage.setItem('admin_token', token);
     setAdminToken(token);
     setIsAuthenticated(true);
     navigate('/admin');
@@ -171,6 +172,7 @@ export default function App() {
       console.error('Logout error:', err);
     }
     sessionStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_token');
     setAdminToken(null);
     setIsAuthenticated(false);
     navigate('/admin');
