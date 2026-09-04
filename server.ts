@@ -3,8 +3,8 @@ dotenv.config();
 
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import cookieParser from 'cookie-parser';
-import { createServer as createViteServer } from 'vite';
 import { dbService } from './server/db/database';
 import authRoutes from './server/routes/auth';
 import publicRoutes from './server/routes/public';
@@ -40,13 +40,29 @@ async function startServer() {
 
   // Vite middleware for development vs Static files for production
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    // Check if index.html exists directly in __dirname or in process.cwd()/dist
+    let distPath = path.join(process.cwd(), 'dist');
+    if (!fs.existsSync(path.join(distPath, 'index.html')) && typeof __dirname !== 'undefined') {
+      if (fs.existsSync(path.join(__dirname, 'index.html'))) {
+        distPath = __dirname;
+      }
+    }
+
+    // Security: Do not expose server bundle or source maps via static routes
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/server.') || req.path.endsWith('.map')) {
+        return res.status(404).send('Not found');
+      }
+      next();
+    });
+
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
