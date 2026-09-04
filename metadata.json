@@ -1,0 +1,6 @@
+{
+  "name": "Cinematic Birthday Surprise",
+  "description": "A production-ready full-stack interactive birthday surprise experience with cinematic storytelling, audio visualizer, love tree, interactive cake, memories, Shayari, and real-time MongoDB admin panel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
