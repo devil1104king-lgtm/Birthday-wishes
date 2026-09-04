@@ -85,7 +85,8 @@ export interface VideoItem {
   description: string;
   thumbnailUrl: string;
   videoUrl: string;
-  platform: 'mp4' | 'youtube' | 'instagram';
+  platform: 'mp4' | 'youtube' | 'instagram' | string;
+  videoType?: string;
   enabled: boolean;
   order: number;
 }

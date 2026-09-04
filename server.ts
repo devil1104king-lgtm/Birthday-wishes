@@ -9,6 +9,7 @@ import { dbService } from './server/db/database';
 import authRoutes from './server/routes/auth';
 import publicRoutes from './server/routes/public';
 import adminRoutes from './server/routes/admin';
+import mediaRoutes from './server/routes/media';
 
 async function startServer() {
   const app = express();
@@ -34,6 +35,7 @@ async function startServer() {
   app.use('/api/auth', authRoutes);
   app.use('/api/public', publicRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/media', mediaRoutes);
 
   // Direct route aliases for required endpoints
   app.use('/api', publicRoutes);

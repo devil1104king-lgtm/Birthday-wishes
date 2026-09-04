@@ -241,7 +241,7 @@ export default function App() {
       {/* Cinematic Poetic Sequence */}
       {hasOpened && showIntro && (
         <CinematicIntro
-          recipientName={data.hero?.recipientName || data.settings?.recipientName || 'Meri Jaan'}
+          recipientName={data.settings?.recipientName || 'Meri Jaan'}
           onComplete={handleIntroComplete}
         />
       )}

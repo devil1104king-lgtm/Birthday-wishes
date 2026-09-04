@@ -3,8 +3,8 @@ import { dbService } from '../db/database';
 
 const router = Router();
 
-// GET /api/public/content or /api/public/all - single composite endpoint for fast, seamless site load
-router.get(['/content', '/all'], async (req: Request, res: Response) => {
+// GET /api/public/content, /api/public/all, or /api/public/data - single composite endpoint for fast, seamless site load
+router.get(['/content', '/all', '/data'], async (req: Request, res: Response) => {
   try {
     const data = await dbService.getPublicData();
     res.setHeader('Cache-Control', 'no-cache');

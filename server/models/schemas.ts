@@ -41,7 +41,7 @@ export interface ISiteSettings {
 export const SiteSettingsSchema = new Schema<ISiteSettings>(
   {
     siteTitle: { type: String, default: 'Happy Birthday My Love' },
-    recipientName: { type: String, default: 'Aanchal' },
+    recipientName: { type: String, default: 'Meri Jaan' },
     relationshipLabel: { type: String, default: 'Meri Jaan' },
     birthdayDate: { type: String, default: '2026-09-15' },
     birthdayTime: { type: String, default: '00:00' },
@@ -79,7 +79,7 @@ export interface IHeroSection {
 export const HeroSectionSchema = new Schema<IHeroSection>(
   {
     mainHeading: { type: String, default: 'Happy Birthday' },
-    recipientName: { type: String, default: 'Aanchal' },
+    recipientName: { type: String, default: '' },
     subtitle: { type: String, default: 'To the person who makes life a little more beautiful...' },
     showFloatingBalloons: { type: Boolean, default: true },
     showConfetti: { type: Boolean, default: true },

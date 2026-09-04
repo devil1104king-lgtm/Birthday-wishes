@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Camera, X, Heart, Calendar, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Camera, X, Heart, Calendar, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { MemoryItem } from '../../types';
 
 interface MemoryGallerySectionProps {
@@ -7,26 +7,53 @@ interface MemoryGallerySectionProps {
 }
 
 export default function MemoryGallerySection({ memories }: MemoryGallerySectionProps) {
-  const [selectedMemory, setSelectedMemory] = useState<MemoryItem | null>(null);
-  const [lightboxIndex, setLightboxIndex] = useState<number>(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [isZoomed, setIsZoomed] = useState<boolean>(false);
 
   if (!memories || memories.length === 0) return null;
 
+  const selectedMemory = lightboxIndex !== null ? memories[lightboxIndex] : null;
+
+  // Keyboard navigation for Lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowRight' && memories.length > 1) {
+        nextLightbox();
+      } else if (e.key === 'ArrowLeft' && memories.length > 1) {
+        prevLightbox();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, memories.length]);
+
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
-    setSelectedMemory(memories[index]);
+    setIsZoomed(false);
+  };
+
+  const closeLightbox = () => {
+    setLightboxIndex(null);
+    setIsZoomed(false);
   };
 
   const nextLightbox = () => {
+    if (lightboxIndex === null) return;
     const nextIdx = (lightboxIndex + 1) % memories.length;
     setLightboxIndex(nextIdx);
-    setSelectedMemory(memories[nextIdx]);
+    setIsZoomed(false);
   };
 
   const prevLightbox = () => {
+    if (lightboxIndex === null) return;
     const prevIdx = (lightboxIndex - 1 + memories.length) % memories.length;
     setLightboxIndex(prevIdx);
-    setSelectedMemory(memories[prevIdx]);
+    setIsZoomed(false);
   };
 
   return (
@@ -59,11 +86,10 @@ export default function MemoryGallerySection({ memories }: MemoryGallerySectionP
               <img
                 src={mem.imageUrl}
                 alt={mem.title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 loading="lazy"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
-                  // Fallback if image fails to load
                   (e.target as HTMLImageElement).src =
                     'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80';
                 }}
@@ -94,7 +120,7 @@ export default function MemoryGallerySection({ memories }: MemoryGallerySectionP
               </div>
 
               <div className="mt-4 pt-3 border-t border-neutral-800/60 flex items-center justify-between text-xs text-neutral-500">
-                <span>View Memory</span>
+                <span>View Full Photo</span>
                 <Heart className="w-3.5 h-3.5 group-hover:fill-rose-500 group-hover:text-rose-500 transition-colors" />
               </div>
             </div>
@@ -102,47 +128,76 @@ export default function MemoryGallerySection({ memories }: MemoryGallerySectionP
         ))}
       </div>
 
-      {/* Lightbox Modal */}
-      {selectedMemory && (
+      {/* Cinematic Fullscreen Lightbox Modal */}
+      {selectedMemory && lightboxIndex !== null && (
         <div
           id="memory-lightbox-modal"
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4"
-          onClick={() => setSelectedMemory(null)}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 select-none"
+          onClick={closeLightbox}
         >
           <div
-            className="relative max-w-3xl w-full bg-neutral-900 border border-rose-500/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="relative max-w-4xl w-full bg-neutral-900 border border-rose-500/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button
-              id="close-lightbox-btn"
-              onClick={() => setSelectedMemory(null)}
-              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Top Toolbar */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-800 bg-neutral-950/80 z-20">
+              <div className="flex items-center gap-2 text-xs text-neutral-400">
+                <span className="text-rose-400 font-semibold">{lightboxIndex + 1}</span>
+                <span>/</span>
+                <span>{memories.length}</span>
+                {selectedMemory.date && (
+                  <>
+                    <span className="text-neutral-600">•</span>
+                    <span className="text-neutral-300">{selectedMemory.date}</span>
+                  </>
+                )}
+              </div>
 
-            {/* Image */}
-            <div className="relative w-full max-h-[60vh] bg-black flex items-center justify-center overflow-hidden">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsZoomed(!isZoomed)}
+                  className="p-2 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors"
+                  title={isZoomed ? 'Zoom Out' : 'Zoom In'}
+                >
+                  {isZoomed ? <ZoomOut className="w-4 h-4" /> : <ZoomIn className="w-4 h-4" />}
+                </button>
+                <button
+                  id="close-lightbox-btn"
+                  onClick={closeLightbox}
+                  className="p-2 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors"
+                  aria-label="Close Lightbox"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Main Image Stage */}
+            <div className="relative w-full max-h-[68vh] bg-black flex items-center justify-center overflow-auto p-2">
               <img
                 src={selectedMemory.imageUrl}
                 alt={selectedMemory.title}
-                className="max-h-[60vh] w-auto object-contain"
+                className={`transition-transform duration-300 object-contain ${
+                  isZoomed ? 'scale-150 cursor-zoom-out' : 'max-h-[64vh] w-auto cursor-zoom-in'
+                }`}
+                onClick={() => setIsZoomed(!isZoomed)}
                 referrerPolicy="no-referrer"
               />
 
-              {/* Navigation arrows in Lightbox */}
+              {/* Navigation Arrows */}
               {memories.length > 1 && (
                 <>
                   <button
                     onClick={prevLightbox}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/20"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center border border-white/20 transition-all z-10"
+                    aria-label="Previous image"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <button
                     onClick={nextLightbox}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center border border-white/20"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center border border-white/20 transition-all z-10"
+                    aria-label="Next image"
                   >
                     <ChevronRight className="w-6 h-6" />
                   </button>
@@ -150,18 +205,18 @@ export default function MemoryGallerySection({ memories }: MemoryGallerySectionP
               )}
             </div>
 
-            {/* Caption Info */}
-            <div className="p-6 overflow-y-auto">
-              {selectedMemory.date && (
-                <span className="text-xs font-semibold text-rose-400 uppercase tracking-wider">
-                  {selectedMemory.date}
-                </span>
-              )}
-              <h3 className="text-xl sm:text-2xl font-serif font-bold text-white mt-1 mb-2">
+            {/* Caption & Memory Description */}
+            <div className="p-5 sm:p-6 bg-neutral-900 border-t border-neutral-800/80 overflow-y-auto max-h-[22vh]">
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-white mb-1.5">
                 {selectedMemory.title}
               </h3>
+              {selectedMemory.caption && (
+                <p className="text-xs sm:text-sm text-rose-300 italic mb-2">
+                  "{selectedMemory.caption}"
+                </p>
+              )}
               {selectedMemory.description && (
-                <p className="text-sm text-neutral-300 leading-relaxed font-light">
+                <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
                   {selectedMemory.description}
                 </p>
               )}

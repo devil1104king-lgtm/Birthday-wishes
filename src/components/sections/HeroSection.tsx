@@ -8,8 +8,15 @@ interface HeroProps {
 }
 
 export default function HeroSection({ hero, settings, onScrollToExplore }: HeroProps) {
-  const recipient = hero.recipientName || settings.recipientName || 'Meri Jaan';
-  const heading = hero.mainHeading || settings.heroHeading || 'Happy Birthday';
+  const recipientName = (settings.recipientName || '').trim() || 'Meri Jaan';
+  const relationship = (settings.relationshipLabel || '').trim() || 'Meri Jaan';
+
+  // Construct heading: if custom mainHeading already has recipientName, use it; otherwise combine mainHeading + recipientName
+  let displayHeading = (hero.mainHeading || settings.heroHeading || 'Happy Birthday').trim();
+  if (recipientName && !displayHeading.toLowerCase().includes(recipientName.toLowerCase())) {
+    displayHeading = `${displayHeading} ${recipientName}`;
+  }
+
   const subtitle = hero.subtitle || settings.heroSubtitle || 'To the person who makes life a little more beautiful...';
 
   return (
@@ -49,10 +56,10 @@ export default function HeroSection({ hero, settings, onScrollToExplore }: HeroP
         id="hero-heading"
         className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-rose-100 to-rose-300 tracking-tight leading-tight max-w-4xl drop-shadow-md"
       >
-        {heading}
+        {displayHeading}
       </h1>
 
-      {/* Recipient Name with Glowing Aura */}
+      {/* Relationship Label with Glowing Aura */}
       <div className="mt-4 mb-6 relative inline-block group">
         <div className="absolute -inset-2 bg-gradient-to-r from-rose-500 to-pink-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-75 transition duration-1000"></div>
         <h2
@@ -60,7 +67,7 @@ export default function HeroSection({ hero, settings, onScrollToExplore }: HeroP
           className="relative text-3xl sm:text-5xl md:text-6xl font-['Rozha_One',serif] text-rose-400 tracking-wider flex items-center justify-center gap-3"
           style={{ textShadow: '0 0 35px rgba(244,63,94,0.6)' }}
         >
-          <span>{recipient}</span>
+          <span>{relationship}</span>
           <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-rose-500 fill-rose-500 inline-block animate-pulse shrink-0" />
         </h2>
       </div>

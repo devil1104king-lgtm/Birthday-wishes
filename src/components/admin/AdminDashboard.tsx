@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import {
   Settings,
   Music,
@@ -23,6 +23,8 @@ import {
   X,
   Menu,
   ChevronDown,
+  Upload,
+  Loader2,
 } from 'lucide-react';
 import {
   AdminDataBundle,
@@ -74,6 +76,46 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
     isNew: boolean;
   } | null>(null);
 
+  // File upload state
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+
+  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>, key: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingKey(key);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/media/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        if (editingItem) {
+          setEditingItem({
+            ...editingItem,
+            item: { ...editingItem.item, [key]: json.data.url },
+          });
+        }
+        showToast('success', `File "${json.data.filename}" uploaded successfully!`);
+      } else {
+        showToast('error', json.error || 'Failed to upload media file');
+      }
+    } catch (err: any) {
+      showToast('error', err.message || 'File upload failed');
+    } finally {
+      setUploadingKey(null);
+      if (e.target) e.target.value = '';
+    }
+  };
+
   // Fetch full data bundle
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -120,9 +162,13 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
       const json = await res.json();
       if (res.ok && json.success) {
         showToast('success', `${endpoint.toUpperCase()} changes saved successfully!`);
-        // Update local state
+        // Update local state and sync hero recipient if settings were updated
         if (data) {
-          setData({ ...data, [endpoint]: json.data });
+          const updatedHero =
+            endpoint === 'settings' && data.hero
+              ? { ...data.hero, recipientName: json.data?.recipientName || '' }
+              : data.hero;
+          setData({ ...data, [endpoint]: json.data, hero: updatedHero });
         }
       } else {
         showToast('error', json.error || 'Failed to update section');
@@ -1432,6 +1478,74 @@ export default function AdminDashboard({ token, onLogout, onViewSite }: AdminDas
                           }
                           className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-xs text-white focus:border-rose-500 focus:outline-none"
                         />
+                      ) : key.toLowerCase().includes('url') ||
+                        key.toLowerCase().includes('image') ||
+                        key.toLowerCase().includes('video') ||
+                        key.toLowerCase().includes('audio') ? (
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={val || ''}
+                              placeholder="https://... or upload file"
+                              onChange={(e) =>
+                                setEditingItem({
+                                  ...editingItem,
+                                  item: { ...editingItem.item, [key]: e.target.value },
+                                })
+                              }
+                              className="flex-grow px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-xs text-white focus:border-rose-500 focus:outline-none"
+                            />
+                            <label className="px-3 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-medium flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors">
+                              {uploadingKey === key ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Upload className="w-3.5 h-3.5" />
+                              )}
+                              <span>{uploadingKey === key ? 'Uploading...' : 'Upload'}</span>
+                              <input
+                                type="file"
+                                accept={
+                                  key.toLowerCase().includes('video')
+                                    ? 'video/*'
+                                    : key.toLowerCase().includes('audio')
+                                    ? 'audio/*'
+                                    : 'image/*'
+                                }
+                                disabled={uploadingKey !== null}
+                                onChange={(e) => handleFileUpload(e, key)}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          {/* Helper validation hints */}
+                          {key === 'videoUrl' && (
+                            <p className="text-[10px] text-neutral-400 leading-tight">
+                              💡 Direct <span className="text-rose-300">.mp4</span> or{' '}
+                              <span className="text-rose-300">YouTube</span> embed URLs are supported.
+                              For reels, upload the video file directly for full-screen streaming.
+                            </p>
+                          )}
+                          {key === 'audioUrl' && (
+                            <p className="text-[10px] text-neutral-400 leading-tight">
+                              💡 Direct <span className="text-rose-300">.mp3/.ogg</span> link or upload
+                              an audio file.
+                            </p>
+                          )}
+
+                          {/* Live preview if URL exists */}
+                          {val && (key.toLowerCase().includes('image') || key.toLowerCase().includes('thumbnail') || key.toLowerCase().includes('cover')) && (
+                            <div className="w-20 h-14 rounded-lg overflow-hidden border border-neutral-800 bg-black">
+                              <img
+                                src={val}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <input
                           type="text"

@@ -1,7 +1,7 @@
 {
   "settings": {
     "siteTitle": "Happy Birthday Meri Jaan ❤️",
-    "recipientName": "Aanchal",
+    "recipientName": "Meri Jaan",
     "relationshipLabel": "Meri Jaan",
     "birthdayDate": "2026-09-15",
     "birthdayTime": "00:00",
@@ -21,7 +21,7 @@
   },
   "hero": {
     "mainHeading": "Happy Birthday",
-    "recipientName": "Aanchal",
+    "recipientName": "Meri Jaan",
     "subtitle": "To the person who turns ordinary moments into unforgettable memories...",
     "showFloatingBalloons": true,
     "showConfetti": true,

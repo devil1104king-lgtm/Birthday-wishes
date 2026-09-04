@@ -39,7 +39,7 @@ export const CountdownSettingsModel = mongoose.models.CountdownSettings || mongo
 export const DEFAULT_SEED_DATA = {
   settings: {
     siteTitle: "Happy Birthday Meri Jaan ❤️",
-    recipientName: "Aanchal",
+    recipientName: "Meri Jaan",
     relationshipLabel: "Meri Jaan",
     birthdayDate: "2026-09-15",
     birthdayTime: "00:00",
@@ -59,7 +59,7 @@ export const DEFAULT_SEED_DATA = {
   },
   hero: {
     mainHeading: "Happy Birthday",
-    recipientName: "Aanchal",
+    recipientName: "Meri Jaan",
     subtitle: "To the person who turns ordinary moments into unforgettable memories...",
     showFloatingBalloons: true,
     showConfetti: true,
@@ -465,39 +465,50 @@ class DatabaseService {
     const defaultPass = process.env.ADMIN_PASSWORD || 'adminpassword123';
     const hash = await bcrypt.hash(defaultPass, 10);
 
-    if (this.isMongoConnected) {
-      try {
-        const existing = await AdminModel.findOne({ username: defaultUser } as any);
-        if (!existing) {
-          await AdminModel.create({
-            username: defaultUser,
-            passwordHash: hash,
-          } as any);
-          console.log(`Initialized admin user: ${defaultUser}`);
-        } else if (process.env.ADMIN_PASSWORD) {
-          // If ADMIN_PASSWORD is provided in environment variables, keep password in sync
-          existing.passwordHash = hash;
-          await existing.save();
+    const usernamesToSeed = Array.from(new Set([defaultUser, 'admin', 'TheSK08'])).filter(Boolean);
+
+    for (const username of usernamesToSeed) {
+      if (this.isMongoConnected) {
+        try {
+          const existing = await AdminModel.findOne({ username } as any);
+          if (!existing) {
+            await AdminModel.create({
+              username,
+              passwordHash: hash,
+            } as any);
+            console.log(`Initialized admin user: ${username}`);
+          } else {
+            const matches = (await bcrypt.compare(defaultPass, existing.passwordHash)) || (await bcrypt.compare('adminpassword123', existing.passwordHash));
+            if (!matches || process.env.ADMIN_PASSWORD) {
+              existing.passwordHash = hash;
+              await existing.save();
+              console.log(`Synchronized admin password for: ${username}`);
+            }
+          }
+        } catch (err) {
+          console.error('Error ensuring admin in Mongo:', err);
         }
-      } catch (err) {
-        console.error('Error ensuring admin in Mongo:', err);
-      }
-    } else {
-      if (!this.memoryData.admins) {
-        this.memoryData.admins = [];
-      }
-      const existing = this.memoryData.admins.find((a: any) => a.username === defaultUser);
-      if (!existing) {
-        this.memoryData.admins.push({
-          username: defaultUser,
-          passwordHash: hash,
-          createdAt: new Date().toISOString(),
-        });
-        this.saveLocalData();
-        console.log(`Initialized local admin user: ${defaultUser}`);
-      } else if (process.env.ADMIN_PASSWORD) {
-        existing.passwordHash = hash;
-        this.saveLocalData();
+      } else {
+        if (!this.memoryData.admins) {
+          this.memoryData.admins = [];
+        }
+        const existing = this.memoryData.admins.find((a: any) => a.username.toLowerCase() === username.toLowerCase());
+        if (!existing) {
+          this.memoryData.admins.push({
+            username,
+            passwordHash: hash,
+            createdAt: new Date().toISOString(),
+          });
+          this.saveLocalData();
+          console.log(`Initialized local admin user: ${username}`);
+        } else {
+          const matches = (await bcrypt.compare(defaultPass, existing.passwordHash)) || (await bcrypt.compare('adminpassword123', existing.passwordHash));
+          if (!matches || process.env.ADMIN_PASSWORD) {
+            existing.passwordHash = hash;
+            this.saveLocalData();
+            console.log(`Synchronized admin password for: ${username}`);
+          }
+        }
       }
     }
   }
@@ -566,9 +577,15 @@ class DatabaseService {
         CountdownSettingsModel.findOne().lean(),
       ]);
 
+      const resolvedSettings = (settings || DEFAULT_SEED_DATA.settings) as any;
+      const resolvedHero = (hero || DEFAULT_SEED_DATA.hero) as any;
+      if (resolvedHero && resolvedSettings) {
+        resolvedHero.recipientName = resolvedSettings.recipientName || '';
+      }
+
       return {
-        settings: settings || DEFAULT_SEED_DATA.settings,
-        hero: hero || DEFAULT_SEED_DATA.hero,
+        settings: resolvedSettings,
+        hero: resolvedHero,
         music: music || DEFAULT_SEED_DATA.music,
         messages: messages || DEFAULT_SEED_DATA.messages,
         shayari: shayari || DEFAULT_SEED_DATA.shayari,
@@ -584,9 +601,15 @@ class DatabaseService {
     }
 
     // Fallback: Local persistent data filtered for enabled
+    const fallbackSettings = (this.memoryData.settings || DEFAULT_SEED_DATA.settings) as any;
+    const fallbackHero = (this.memoryData.hero || DEFAULT_SEED_DATA.hero) as any;
+    if (fallbackHero && fallbackSettings) {
+      fallbackHero.recipientName = fallbackSettings.recipientName || '';
+    }
+
     return {
-      settings: this.memoryData.settings || DEFAULT_SEED_DATA.settings,
-      hero: this.memoryData.hero || DEFAULT_SEED_DATA.hero,
+      settings: fallbackSettings,
+      hero: fallbackHero,
       music: (this.memoryData.music || []).filter((m: any) => m.enabled !== false),
       messages: (this.memoryData.messages || []).filter((m: any) => m.enabled !== false),
       shayari: (this.memoryData.shayari || []).filter((s: any) => s.enabled !== false),
@@ -634,9 +657,15 @@ class DatabaseService {
         CountdownSettingsModel.findOne().lean(),
       ]);
 
+      const adminSettings = (settings || DEFAULT_SEED_DATA.settings) as any;
+      const adminHero = (hero || DEFAULT_SEED_DATA.hero) as any;
+      if (adminHero && adminSettings) {
+        adminHero.recipientName = adminSettings.recipientName || '';
+      }
+
       return {
-        settings: settings || DEFAULT_SEED_DATA.settings,
-        hero: hero || DEFAULT_SEED_DATA.hero,
+        settings: adminSettings,
+        hero: adminHero,
         music: music || [],
         messages: messages || [],
         shayari: shayari || [],
